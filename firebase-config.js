@@ -8,17 +8,14 @@
 // https://console.firebase.google.com, ative Firestore + Authentication
 // (método Anônimo), registre um app Web e cole aqui o objeto que o
 // console mostrar.
-export const firebaseConfig = null;
-/* Exemplo, depois de criar o projeto:
 export const firebaseConfig = {
-  apiKey: "AIza...",
-  authDomain: "financas-casal.firebaseapp.com",
-  projectId: "financas-casal",
-  storageBucket: "financas-casal.appspot.com",
-  messagingSenderId: "...",
-  appId: "..."
+  apiKey: "AIzaSyB56FvRq48FkQDkKNRN8vssM3KByMmTuBs",
+  authDomain: "financas-casal-f12e6.firebaseapp.com",
+  projectId: "financas-casal-f12e6",
+  storageBucket: "financas-casal-f12e6.firebasestorage.app",
+  messagingSenderId: "1032383118603",
+  appId: "1:1032383118603:web:df3eb5620bcc94e34bf60e"
 };
-*/
 
 // ID sugerido para o "espaço" compartilhado do casal (usado só na primeira
 // vez que abrirem o app, na tela de entrada).
