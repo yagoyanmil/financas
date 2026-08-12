@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle Financeiro Pessoal</title>
+<style>
+  :root{
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --border:#e3e7ee;
+    --text:#1c2333;
+    --muted:#6b7280;
+    --primary:#2f6feb;
+    --primary-dark:#1f4fb0;
+    --green:#1a9e6b;
+    --green-bg:#e6f7f0;
+    --red:#e0463f;
+    --red-bg:#fdecea;
+    --shadow:0 1px 3px rgba(20,25,40,.06), 0 1px 2px rgba(20,25,40,.08);
+    --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:24px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+  header{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+    margin-bottom:20px;
+  }
+  h1{font-size:22px;margin:0;}
+  .sub{color:var(--muted);font-size:13px;margin-top:2px;}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;}
+  button{
+    font:inherit;cursor:pointer;border:1px solid var(--border);background:var(--card);
+    color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;transition:.15s;
+  }
+  button:hover{background:#eef1f6;}
+  button.primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+  button.primary:hover{background:var(--primary-dark);}
+  button.ghost{border:none;background:transparent;color:var(--muted);padding:4px 8px;}
+  button.ghost:hover{color:var(--text);background:#eef1f6;}
+  button.danger{color:var(--red);}
+  input[type=file]{display:none;}
+
+  .month-nav{
+    display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);
+    border-radius:10px;padding:6px 10px;box-shadow:var(--shadow);
+  }
+  .month-nav b{min-width:150px;text-align:center;text-transform:capitalize;font-size:14px;}
+  .month-nav button{padding:4px 10px;}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);}
+  .card .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .card .value{font-size:24px;font-weight:600;margin-top:6px;}
+  .card.green .value{color:var(--green);}
+  .card.red .value{color:var(--red);}
+  .card.balance-pos .value{color:var(--green);}
+  .card.balance-neg .value{color:var(--red);}
+
+  .grid2{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;margin-bottom:20px;}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr;}}
+
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+  .panel h2{font-size:15px;margin:0 0 14px;}
+  .panel h3{font-size:13px;margin:18px 0 8px;color:var(--muted);}
+
+  form.entry-form{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;align-items:end;}
+  @media(max-width:900px){form.entry-form{grid-template-columns:repeat(2,1fr);}}
+  form.entry-form label{font-size:11px;color:var(--muted);display:block;margin-bottom:3px;}
+  form.entry-form input,form.entry-form select{
+    width:100%;padding:8px;border:1px solid var(--border);border-radius:7px;font:inherit;font-size:13px;background:#fbfcfe;
+  }
+  .type-toggle{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+  .type-toggle button{flex:1;border:none;border-radius:0;padding:8px;background:#fbfcfe;}
+  .type-toggle button.active[data-t="gasto"]{background:var(--red-bg);color:var(--red);font-weight:600;}
+  .type-toggle button.active[data-t="receita"]{background:var(--green-bg);color:var(--green);font-weight:600;}
+
+  .table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table{width:100%;min-width:520px;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);}
+  th:last-child,td.row-actions{white-space:nowrap;}
+  th{color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.03em;}
+  td.val{font-weight:600;white-space:nowrap;}
+  td.val.gasto{color:var(--red);}
+  td.val.receita{color:var(--green);}
+  tr:hover td{background:#f8fafc;}
+  .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;background:#eef1f6;}
+  .empty{color:var(--muted);font-size:13px;padding:20px 0;text-align:center;}
+  .row-actions button{padding:3px 7px;font-size:13px;line-height:1;}
+
+  .donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+  .donut{width:160px;height:160px;border-radius:50%;flex:none;position:relative;}
+  .donut .hole{position:absolute;inset:24px;background:var(--card);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+  .donut .hole b{font-size:15px;}
+  .donut .hole span{font-size:10px;color:var(--muted);}
+  .legend{list-style:none;margin:0;padding:0;font-size:12px;flex:1;min-width:160px;}
+  .legend li{display:flex;justify-content:space-between;gap:8px;padding:4px 0;}
+  .legend .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;}
+  .legend .name{display:flex;align-items:center;color:var(--text);}
+  .legend .amt{color:var(--muted);}
+
+  .trend{display:flex;align-items:flex-end;gap:14px;height:160px;padding-top:10px;}
+  .trend .bar-group{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;}
+  .trend .bars{display:flex;gap:3px;align-items:flex-end;height:120px;width:100%;justify-content:center;}
+  .trend .bar{width:14px;border-radius:3px 3px 0 0;background:var(--border);position:relative;}
+  .trend .bar.receita{background:var(--green);}
+  .trend .bar.gasto{background:var(--red);}
+  .trend .m-label{font-size:10px;color:var(--muted);text-transform:capitalize;}
+
+  .cat-manage{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+  .cat-chip{display:flex;align-items:center;gap:6px;background:#eef1f6;border-radius:20px;padding:4px 10px;font-size:12px;}
+  .cat-chip button{padding:0;border:none;background:none;color:var(--muted);font-size:13px;line-height:1;}
+  .cat-add{display:flex;gap:6px;}
+  .cat-add input{flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-size:12px;}
+  .cat-add select{padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-size:12px;}
+
+  .banner{background:#fff8e6;border:1px solid #f0d98c;color:#7a5c00;font-size:12px;padding:10px 14px;border-radius:8px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .banner button{background:#7a5c00;color:#fff;border-color:#7a5c00;padding:5px 10px;}
+  .save-status{font-size:12px;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;gap:6px;}
+  .save-status .dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:none;}
+  footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Controle Financeiro Pessoal</h1>
+      <div class="sub">Lance seus gastos e receitas e acompanhe para onde o dinheiro está indo.</div>
+    </div>
+    <div class="toolbar">
+      <button id="btnExportJson">⬇ Exportar backup (JSON)</button>
+      <button id="btnImportJson">⬆ Importar backup</button>
+      <button id="btnExportCsv">⬇ Exportar Excel (CSV)</button>
+      <input type="file" id="fileInput" accept=".json">
+    </div>
+  </header>
+
+  <div id="storageBanner" class="banner" style="display:none;">
+    <span>⚠️ Não foi possível ativar o salvamento automático neste navegador (comum em modo anônimo/privado). Seus lançamentos vão ficar só nesta aba — exporte o backup (JSON) antes de fechar para não perder os dados.</span>
+    <button id="btnBannerExport">Exportar agora</button>
+  </div>
+  <div id="saveStatus" class="save-status" style="display:none;">
+    <span class="dot"></span><span id="saveStatusText">Salvo automaticamente neste navegador</span>
+  </div>
+
+  <div class="month-nav" style="width:fit-content;margin-bottom:18px;">
+    <button id="prevMonth">‹</button>
+    <b id="monthLabel"></b>
+    <button id="nextMonth">›</button>
+    <button id="btnToday" class="ghost">hoje</button>
+  </div>
+
+  <div class="cards">
+    <div class="card green"><div class="label">Receitas do mês</div><div class="value" id="cardReceitas">R$ 0,00</div></div>
+    <div class="card red"><div class="label">Gastos do mês</div><div class="value" id="cardGastos">R$ 0,00</div></div>
+    <div class="card" id="cardSaldoBox"><div class="label">Saldo do mês</div><div class="value" id="cardSaldo">R$ 0,00</div></div>
+    <div class="card"><div class="label">Lançamentos</div><div class="value" id="cardCount">0</div></div>
+  </div>
+
+  <div class="panel" style="margin-bottom:20px;">
+    <h2 id="formTitle">Novo lançamento</h2>
+    <form class="entry-form" id="entryForm">
+      <div>
+        <label>Tipo</label>
+        <div class="type-toggle">
+          <button type="button" data-t="gasto" class="active">Gasto</button>
+          <button type="button" data-t="receita">Receita</button>
+        </div>
+      </div>
+      <div>
+        <label>Data</label>
+        <input type="date" id="fData" required>
+      </div>
+      <div>
+        <label>Categoria</label>
+        <select id="fCategoria" required></select>
+      </div>
+      <div style="grid-column:span 2;">
+        <label>Descrição</label>
+        <input type="text" id="fDescricao" placeholder="Ex: Mercado, Uber, salário...">
+      </div>
+      <div>
+        <label>Valor (R$)</label>
+        <input type="number" id="fValor" step="0.01" min="0" placeholder="0,00" required>
+      </div>
+      <div style="grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;">
+        <button type="button" id="btnCancelEdit" style="display:none;">Cancelar edição</button>
+        <button type="submit" class="primary" id="btnSubmit">Adicionar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Gastos por categoria — <span id="donutMonthLabel"></span></h2>
+      <div class="donut-wrap" id="donutWrap">
+        <div class="empty">Sem gastos neste mês ainda.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Evolução — últimos 6 meses</h2>
+      <div class="trend" id="trendChart"></div>
+      <div style="display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:6px;">
+        <span><span class="sw" style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--green);margin-right:4px;"></span>Receitas</span>
+        <span><span class="sw" style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--red);margin-right:4px;"></span>Gastos</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:20px;">
+    <h2>Gerenciar categorias</h2>
+    <h3>Categorias de gasto</h3>
+    <div class="cat-manage" id="catListGasto"></div>
+    <h3>Categorias de receita</h3>
+    <div class="cat-manage" id="catListReceita"></div>
+    <div class="cat-add">
+      <select id="catAddTipo"><option value="gasto">Gasto</option><option value="receita">Receita</option></select>
+      <input type="text" id="catAddNome" placeholder="Nova categoria...">
+      <button type="button" id="btnAddCat">Adicionar</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Lançamentos do mês</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+        <tbody id="entryTableBody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="tableEmpty" style="display:none;">Nenhum lançamento neste mês.</div>
+  </div>
+
+  <footer>Seus dados não são enviados para nenhum servidor — ficam salvos automaticamente neste navegador. Se for usar em outro computador/navegador, ou quiser um backup, use "Exportar backup (JSON)" e depois "Importar backup" no outro lugar.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DEFAULT_CATEGORIES = {
+    gasto: ["Alimentação","Transporte","Moradia","Lazer","Saúde","Educação","Compras","Contas/Serviços","Outros"],
+    receita: ["Salário","Extra","Investimentos","Outros"]
+  };
+
+  var PALETTE = ["#2f6feb","#e0463f","#f2a541","#1a9e6b","#8e5fd9","#e05a9e","#17a2b8","#6b7280","#c98a2c","#4361ee"];
+
+  var state = {
+    entries: [],
+    categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)),
+    currentType: "gasto",
+    editingId: null,
+    view: (function(){ var d=new Date(); return {year:d.getFullYear(), month:d.getMonth()}; })()
+  };
+
+  var $ = function(id){ return document.getElementById(id); };
+  var currency = function(v){
+    return (v<0?"-":"") + "R$ " + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  };
+  var uid = function(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); };
+  var monthKey = function(y,m){ return y+"-"+String(m+1).padStart(2,"0"); };
+  var MONTH_NAMES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+
+  // ---------- salvamento automático no navegador ----------
+  var STORAGE_KEY = "controle-financeiro-pessoal:v1";
+  var storageOk = (function(){
+    try{
+      localStorage.setItem("__cfp_test__","1");
+      localStorage.removeItem("__cfp_test__");
+      return true;
+    }catch(e){ return false; }
+  })();
+
+  function saveState(){
+    if(!storageOk) return;
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({entries: state.entries, categories: state.categories}));
+      $("saveStatusText").textContent = "Salvo automaticamente neste navegador · " + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    }catch(e){}
+  }
+
+  function loadState(){
+    if(!storageOk) return false;
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      var data = JSON.parse(raw);
+      if(data.entries) state.entries = data.entries;
+      if(data.categories) state.categories = data.categories;
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function persist(){
+    if(storageOk) saveState();
+  }
+
+  if(storageOk){
+    $("saveStatus").style.display = "flex";
+  } else {
+    $("storageBanner").style.display = "flex";
+  }
+
+  window.addEventListener("beforeunload", function(e){
+    if(!storageOk && state.entries.length){
+      e.preventDefault();
+      e.returnValue = "";
+    }
+  });
+
+  // ---------- form / categorias ----------
+  function refreshCategorySelect(){
+    var sel = $("fCategoria");
+    sel.innerHTML = "";
+    state.categories[state.currentType].forEach(function(c){
+      var o = document.createElement("option");
+      o.value = c; o.textContent = c;
+      sel.appendChild(o);
+    });
+  }
+
+  document.querySelectorAll(".type-toggle button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".type-toggle button").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      state.currentType = btn.getAttribute("data-t");
+      refreshCategorySelect();
+    });
+  });
+
+  function renderCategoryManager(){
+    ["gasto","receita"].forEach(function(tipo){
+      var box = $(tipo === "gasto" ? "catListGasto" : "catListReceita");
+      box.innerHTML = "";
+      state.categories[tipo].forEach(function(cat){
+        var chip = document.createElement("span");
+        chip.className = "cat-chip";
+        var span = document.createElement("span");
+        span.textContent = cat;
+        var del = document.createElement("button");
+        del.type = "button";
+        del.textContent = "✕";
+        del.title = "Remover categoria";
+        del.addEventListener("click", function(){
+          var inUse = state.entries.some(function(e){ return e.tipo===tipo && e.categoria===cat; });
+          if(inUse && !confirm('A categoria "'+cat+'" já tem lançamentos. Remover mesmo assim? (os lançamentos existentes mantêm o nome da categoria)')) return;
+          state.categories[tipo] = state.categories[tipo].filter(function(c){ return c!==cat; });
+          renderCategoryManager();
+          refreshCategorySelect();
+          persist();
+        });
+        chip.appendChild(span); chip.appendChild(del);
+        box.appendChild(chip);
+      });
+    });
+  }
+
+  $("btnAddCat").addEventListener("click", function(){
+    var tipo = $("catAddTipo").value;
+    var nome = $("catAddNome").value.trim();
+    if(!nome) return;
+    if(state.categories[tipo].indexOf(nome) === -1){
+      state.categories[tipo].push(nome);
+      renderCategoryManager();
+      refreshCategorySelect();
+      persist();
+    }
+    $("catAddNome").value = "";
+  });
+
+  // ---------- lançamentos ----------
+  $("fData").valueAsDate = new Date();
+
+  $("entryForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var valor = parseFloat($("fValor").value);
+    if(isNaN(valor) || valor <= 0) return;
+    var entry = {
+      id: state.editingId || uid(),
+      tipo: state.currentType,
+      data: $("fData").value,
+      categoria: $("fCategoria").value,
+      descricao: $("fDescricao").value.trim(),
+      valor: valor
+    };
+    if(state.editingId){
+      var idx = state.entries.findIndex(function(x){ return x.id===state.editingId; });
+      if(idx>-1) state.entries[idx] = entry;
+      state.editingId = null;
+      $("btnSubmit").textContent = "Adicionar";
+      $("btnCancelEdit").style.display = "none";
+      $("formTitle").textContent = "Novo lançamento";
+    } else {
+      state.entries.push(entry);
+    }
+    persist();
+    var d = new Date(entry.data+"T00:00:00");
+    state.view = {year:d.getFullYear(), month:d.getMonth()};
+    $("entryForm").reset();
+    $("fData").valueAsDate = new Date();
+    refreshCategorySelect();
+    renderAll();
+  });
+
+  $("btnCancelEdit").addEventListener("click", function(){
+    state.editingId = null;
+    $("entryForm").reset();
+    $("fData").valueAsDate = new Date();
+    $("btnSubmit").textContent = "Adicionar";
+    $("btnCancelEdit").style.display = "none";
+    $("formTitle").textContent = "Novo lançamento";
+  });
+
+  function startEdit(id){
+    var entry = state.entries.find(function(e){ return e.id===id; });
+    if(!entry) return;
+    state.editingId = id;
+    state.currentType = entry.tipo;
+    document.querySelectorAll(".type-toggle button").forEach(function(b){
+      b.classList.toggle("active", b.getAttribute("data-t")===entry.tipo);
+    });
+    refreshCategorySelect();
+    $("fData").value = entry.data;
+    $("fCategoria").value = entry.categoria;
+    $("fDescricao").value = entry.descricao;
+    $("fValor").value = entry.valor;
+    $("btnSubmit").textContent = "Salvar alteração";
+    $("btnCancelEdit").style.display = "inline-block";
+    $("formTitle").textContent = "Editando lançamento";
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function deleteEntry(id){
+    if(!confirm("Excluir este lançamento?")) return;
+    state.entries = state.entries.filter(function(e){ return e.id!==id; });
+    persist();
+    renderAll();
+  }
+
+  // ---------- navegação de mês ----------
+  $("prevMonth").addEventListener("click", function(){
+    state.view.month--;
+    if(state.view.month<0){ state.view.month=11; state.view.year--; }
+    renderAll();
+  });
+  $("nextMonth").addEventListener("click", function(){
+    state.view.month++;
+    if(state.view.month>11){ state.view.month=0; state.view.year++; }
+    renderAll();
+  });
+  $("btnToday").addEventListener("click", function(){
+    var d = new Date();
+    state.view = {year:d.getFullYear(), month:d.getMonth()};
+    renderAll();
+  });
+
+  function entriesForMonth(y,m){
+    return state.entries.filter(function(e){
+      var d = new Date(e.data+"T00:00:00");
+      return d.getFullYear()===y && d.getMonth()===m;
+    });
+  }
+
+  function summarize(list){
+    var r=0,g=0;
+    list.forEach(function(e){ if(e.tipo==="receita") r+=e.valor; else g+=e.valor; });
+    return {receitas:r, gastos:g, saldo:r-g};
+  }
+
+  // ---------- render ----------
+  function renderHeader(){
+    $("monthLabel").textContent = MONTH_NAMES[state.view.month] + " de " + state.view.year;
+    $("donutMonthLabel").textContent = MONTH_NAMES[state.view.month] + "/" + state.view.year;
+  }
+
+  function renderCards(list){
+    var s = summarize(list);
+    $("cardReceitas").textContent = currency(s.receitas);
+    $("cardGastos").textContent = currency(s.gastos);
+    $("cardSaldo").textContent = currency(s.saldo);
+    $("cardCount").textContent = list.length;
+    var box = $("cardSaldoBox");
+    box.classList.remove("balance-pos","balance-neg");
+    box.classList.add(s.saldo>=0 ? "balance-pos" : "balance-neg");
+  }
+
+  function renderTable(list){
+    var body = $("entryTableBody");
+    body.innerHTML = "";
+    var sorted = list.slice().sort(function(a,b){ return b.data.localeCompare(a.data); });
+    $("tableEmpty").style.display = sorted.length ? "none" : "block";
+    sorted.forEach(function(e){
+      var tr = document.createElement("tr");
+      var dataFmt = new Date(e.data+"T00:00:00").toLocaleDateString('pt-BR');
+      tr.innerHTML =
+        "<td>"+dataFmt+"</td>" +
+        "<td><span class='tag'>"+(e.tipo==="receita"?"Receita":"Gasto")+"</span></td>" +
+        "<td>"+e.categoria+"</td>" +
+        "<td>"+(e.descricao||"—")+"</td>" +
+        "<td class='val "+e.tipo+"'>"+(e.tipo==="receita"?"+":"-")+" "+currency(e.valor)+"</td>" +
+        "<td class='row-actions'></td>";
+      var actions = tr.querySelector(".row-actions");
+      var editBtn = document.createElement("button");
+      editBtn.className="ghost"; editBtn.textContent="✎"; editBtn.title="Editar";
+      editBtn.addEventListener("click", function(){ startEdit(e.id); });
+      var delBtn = document.createElement("button");
+      delBtn.className="ghost danger"; delBtn.textContent="🗑"; delBtn.title="Excluir";
+      delBtn.addEventListener("click", function(){ deleteEntry(e.id); });
+      actions.appendChild(editBtn); actions.appendChild(delBtn);
+      body.appendChild(tr);
+    });
+  }
+
+  function renderDonut(list){
+    var wrap = $("donutWrap");
+    var gastos = list.filter(function(e){ return e.tipo==="gasto"; });
+    if(!gastos.length){
+      wrap.innerHTML = "<div class='empty'>Sem gastos neste mês ainda.</div>";
+      return;
+    }
+    var byCat = {};
+    gastos.forEach(function(e){ byCat[e.categoria] = (byCat[e.categoria]||0) + e.valor; });
+    var total = Object.values(byCat).reduce(function(a,b){return a+b;},0);
+    var cats = Object.keys(byCat).sort(function(a,b){ return byCat[b]-byCat[a]; });
+
+    var gradientParts = [];
+    var acc = 0;
+    var legendHtml = "";
+    cats.forEach(function(cat, i){
+      var color = PALETTE[i % PALETTE.length];
+      var pct = byCat[cat]/total*100;
+      gradientParts.push(color+" "+acc+"% "+(acc+pct)+"%");
+      acc += pct;
+      legendHtml += "<li><span class='name'><span class='sw' style='background:"+color+"'></span>"+cat+" <span style='color:var(--muted);margin-left:4px;'>("+pct.toFixed(0)+"%)</span></span><span class='amt'>"+currency(byCat[cat])+"</span></li>";
+    });
+
+    wrap.innerHTML =
+      "<div class='donut' style='background:conic-gradient("+gradientParts.join(",")+")'>" +
+        "<div class='hole'><b>"+currency(total)+"</b><span>total gasto</span></div>" +
+      "</div>" +
+      "<ul class='legend'>"+legendHtml+"</ul>";
+  }
+
+  function renderTrend(){
+    var chart = $("trendChart");
+    chart.innerHTML = "";
+    var months = [];
+    for(var i=5;i>=0;i--){
+      var m = state.view.month - i, y = state.view.year;
+      while(m<0){ m+=12; y--; }
+      months.push({year:y, month:m});
+    }
+    var sums = months.map(function(mo){ return summarize(entriesForMonth(mo.year, mo.month)); });
+    var max = Math.max.apply(null, sums.map(function(s){ return Math.max(s.receitas, s.gastos); }).concat([1]));
+
+    months.forEach(function(mo, i){
+      var s = sums[i];
+      var group = document.createElement("div");
+      group.className = "bar-group";
+      var bars = document.createElement("div");
+      bars.className = "bars";
+
+      var rBar = document.createElement("div");
+      rBar.className = "bar receita";
+      rBar.style.height = Math.max(2, (s.receitas/max*120)) + "px";
+      rBar.title = "Receitas: " + currency(s.receitas);
+
+      var gBar = document.createElement("div");
+      gBar.className = "bar gasto";
+      gBar.style.height = Math.max(2, (s.gastos/max*120)) + "px";
+      gBar.title = "Gastos: " + currency(s.gastos);
+
+      bars.appendChild(rBar); bars.appendChild(gBar);
+      var label = document.createElement("div");
+      label.className = "m-label";
+      label.textContent = MONTH_NAMES[mo.month].slice(0,3) + "/" + String(mo.year).slice(2);
+
+      group.appendChild(bars); group.appendChild(label);
+      chart.appendChild(group);
+    });
+  }
+
+  function renderAll(){
+    renderHeader();
+    var list = entriesForMonth(state.view.year, state.view.month);
+    renderCards(list);
+    renderTable(list);
+    renderDonut(list);
+    renderTrend();
+    renderCategoryManager();
+  }
+
+  // ---------- export / import ----------
+  function downloadBlob(content, filename, mime){
+    var blob = new Blob([content], {type: mime});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportJson(){
+    var data = { entries: state.entries, categories: state.categories, exportedAt: new Date().toISOString() };
+    var ts = new Date().toISOString().slice(0,10);
+    downloadBlob(JSON.stringify(data, null, 2), "controle-financeiro-backup-"+ts+".json", "application/json");
+  }
+
+  function exportCsv(){
+    var rows = [["Data","Tipo","Categoria","Descrição","Valor"]];
+    state.entries.slice().sort(function(a,b){ return a.data.localeCompare(b.data); }).forEach(function(e){
+      rows.push([e.data, e.tipo==="receita"?"Receita":"Gasto", e.categoria, (e.descricao||"").replace(/"/g,'""'), e.valor.toFixed(2).replace(".",",")]);
+    });
+    var csv = rows.map(function(r){
+      return r.map(function(f){ return /[",;\n]/.test(f) ? '"'+f+'"' : f; }).join(";");
+    }).join("\r\n");
+    var ts = new Date().toISOString().slice(0,10);
+    downloadBlob("﻿"+csv, "controle-financeiro-"+ts+".csv", "text/csv;charset=utf-8;");
+  }
+
+  function importJson(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var data = JSON.parse(reader.result);
+        if(!data.entries) throw new Error("formato inválido");
+        var replace = confirm("Importar vai SUBSTITUIR os lançamentos atuais na tela pelos do arquivo. Continuar?");
+        if(!replace) return;
+        state.entries = data.entries;
+        if(data.categories) state.categories = data.categories;
+        persist();
+        if(state.entries.length){
+          var d = new Date(state.entries[state.entries.length-1].data+"T00:00:00");
+          state.view = {year:d.getFullYear(), month:d.getMonth()};
+        }
+        refreshCategorySelect();
+        renderAll();
+        alert("Backup importado com sucesso: " + state.entries.length + " lançamento(s).");
+      }catch(err){
+        alert("Não foi possível ler este arquivo. Verifique se é um backup JSON exportado por esta mesma página.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  $("btnExportJson").addEventListener("click", exportJson);
+  $("btnBannerExport").addEventListener("click", exportJson);
+  $("btnExportCsv").addEventListener("click", exportCsv);
+  $("btnImportJson").addEventListener("click", function(){ $("fileInput").click(); });
+  $("fileInput").addEventListener("change", function(e){
+    if(e.target.files[0]) importJson(e.target.files[0]);
+    e.target.value = "";
+  });
+
+  // ---------- init ----------
+  loadState();
+  refreshCategorySelect();
+  renderAll();
+})();
+</script>
+</body>
+</html>
