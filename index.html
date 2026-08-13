@@ -20,7 +20,7 @@
       <p>Este é o ID do espaço de vocês — depois de confirmar, mande para a Gabriela colar em "Já tenho um ID" no aparelho dela.</p>
       <div class="join-id-box">
         <input type="text" id="joinCreateId" readonly>
-        <button type="button" id="btnCopyHouseholdId">Copiar</button>
+        <button type="button" id="btnCopyHouseholdId"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="8" height="9" rx="1.5"/><path d="M3 10.5V3.5A1.5 1.5 0 014.5 2H10"/></svg> Copiar</button>
       </div>
       <button type="button" class="primary" id="btnConfirmCreate" style="width:100%;">Usar este espaço</button>
     </div>
@@ -41,9 +41,9 @@
       <div class="sub">Lancem gastos e receitas juntos e acompanhem para onde o dinheiro está indo.</div>
     </div>
     <div class="toolbar">
-      <button id="btnExportJson">⬇ Exportar backup (JSON)</button>
-      <button id="btnImportJson">⬆ Importar backup</button>
-      <button id="btnExportCsv">⬇ Exportar Excel (CSV)</button>
+      <button id="btnExportJson"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8m0 0l-3-3m3 3l3-3M3 13.5h10"/></svg> Exportar backup (JSON)</button>
+      <button id="btnImportJson"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10V2m0 0L5 5m3-3l3 3M3 13.5h10"/></svg> Importar backup</button>
+      <button id="btnExportCsv"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8m0 0l-3-3m3 3l3-3M3 13.5h10"/></svg> Exportar Excel (CSV)</button>
       <input type="file" id="fileInput" accept=".json">
     </div>
   </header>
@@ -58,12 +58,13 @@
   </div>
 
   <div class="month-nav" style="width:fit-content;margin-bottom:18px;">
-    <button id="prevMonth">‹</button>
+    <button id="prevMonth" aria-label="Mês anterior"><svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg></button>
     <b id="monthLabel"></b>
-    <button id="nextMonth">›</button>
+    <button id="nextMonth" aria-label="Próximo mês"><svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button>
     <button id="btnToday" class="ghost">hoje</button>
   </div>
 
+  <div class="section-eyebrow">Visão geral do mês</div>
   <div class="cards">
     <div class="card green"><div class="label">Receitas do mês</div><div class="value" id="cardReceitas">R$ 0,00</div></div>
     <div class="card red"><div class="label">Gastos do mês</div><div class="value" id="cardGastos">R$ 0,00</div></div>
@@ -81,6 +82,7 @@
     <div class="cards compact" id="statsGrid" style="margin-bottom:0;"></div>
   </div>
 
+  <div class="section-eyebrow">Lançar</div>
   <div class="panel" style="margin-bottom:20px;">
     <h2 id="formTitle">Novo lançamento</h2>
     <form class="entry-form" id="entryForm">
@@ -152,6 +154,7 @@
     </div>
   </div>
 
+  <div class="section-eyebrow">Para onde está indo</div>
   <div class="grid2">
     <div class="panel">
       <h2>Gastos por categoria — <span id="donutMonthLabel"></span></h2>
@@ -162,13 +165,14 @@
     <div class="panel">
       <h2>Evolução — últimos 6 meses</h2>
       <div class="trend" id="trendChart"></div>
-      <div style="display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:6px;">
-        <span><span class="sw" style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--green);margin-right:4px;"></span>Receitas</span>
-        <span><span class="sw" style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--red);margin-right:4px;"></span>Gastos</span>
+      <div class="trend-legend">
+        <span><span class="sw" style="background:var(--green);"></span>Receitas</span>
+        <span><span class="sw" style="background:var(--red);"></span>Gastos</span>
       </div>
     </div>
   </div>
 
+  <div class="section-eyebrow">Parcelamentos</div>
   <div class="panel" style="margin-bottom:20px;">
     <h2 id="formTitleParcela">Novo parcelamento</h2>
     <div class="panel-sub">Cadastre uma vez — o valor entra sozinho no total de "Parcelado" de cada mês em que a parcela estiver ativa. Não lance parcelamentos no formulário de lançamento acima.</div>
@@ -220,6 +224,7 @@
     <div class="empty" id="parcelaEmpty" style="display:none;">Nenhum parcelamento cadastrado.</div>
   </div>
 
+  <div class="section-eyebrow">Categorias, formas de pagamento e histórico</div>
   <div class="panel" style="margin-bottom:20px;">
     <h2>Gerenciar categorias e formas de pagamento</h2>
     <h3>Categorias de gasto</h3>
@@ -253,9 +258,9 @@
   <div class="panel" style="margin-top:20px;">
     <h2>Resumo anual</h2>
     <div class="year-nav" style="margin-bottom:14px;">
-      <button id="prevYear">‹</button>
+      <button id="prevYear" aria-label="Ano anterior"><svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg></button>
       <b id="yearLabel"></b>
-      <button id="nextYear">›</button>
+      <button id="nextYear" aria-label="Próximo ano"><svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button>
     </div>
     <div class="table-wrap">
       <table>

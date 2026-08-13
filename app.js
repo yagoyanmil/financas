@@ -4,7 +4,10 @@ import { firebaseConfig } from "./firebase-config.js";
 
 // ---------------- constantes ----------------
 const MONTH_NAMES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
-const PALETTE = ["#2f6feb","#e0463f","#f2a541","#1a9e6b","#8e5fd9","#e05a9e","#17a2b8","#6b7280","#c98a2c","#4361ee"];
+const PALETTE = ["#33436B","#B5473C","#8C5B72","#2F8F63","#A6791F","#5B7B9A","#7A8B4F","#8A7A4E","#6E5B8C","#4F7B7B"];
+const ICON_EDIT = '<svg class="icon" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2l3 3-8 8-3.5 1 1-3.5z"/></svg>';
+const ICON_TRASH = '<svg class="icon" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h10M6 4V2.5A.5.5 0 016.5 2h3a.5.5 0 01.5.5V4m-7 0l.6 9a1 1 0 001 .9h5.8a1 1 0 001-.9L12 4"/></svg>';
+const ICON_CLOSE = '<svg class="icon" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 1l8 8M9 1l-8 8"/></svg>';
 const PEOPLE = ["Yago","Gabriela","Casa"];
 const DEFAULT_CATEGORIES = {
   gasto: ["Moradia","Água","Luz","Internet","Contas de Casa","Mercado / Alimentação","Uber","Transporte","Saúde","Educação","Lazer","Restaurantes","Vestuário","Assinaturas / Streaming","Cuidados Pessoais","Presentes / Doações","Pets","Parcelas","Investimentos / Poupança","Dívidas / Empréstimos","Outros"],
@@ -386,6 +389,8 @@ function renderCards(effList) {
   box.classList.add(saldo >= 0 ? "balance-pos" : "balance-neg");
 }
 
+const PERSON_COLOR = { Yago: "var(--yago)", Gabriela: "var(--gabriela)", Casa: "var(--casa)" };
+
 function renderPersonCards(effList) {
   const box = $("personCards");
   box.innerHTML = "";
@@ -393,7 +398,7 @@ function renderPersonCards(effList) {
   PEOPLE.forEach((p) => {
     const card = document.createElement("div");
     card.className = "card";
-    card.innerHTML = `<div class="label">Gasto ${p}</div><div class="value small">${currency(totals[p] || 0)}</div>`;
+    card.innerHTML = `<div class="label"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${PERSON_COLOR[p]};margin-right:5px;"></span>Gasto ${p}</div><div class="value small">${currency(totals[p] || 0)}</div>`;
     box.appendChild(card);
   });
 }
@@ -440,8 +445,8 @@ function renderStats() {
   const c6 = document.createElement("div");
   c6.className = "card";
   c6.innerHTML = `<div class="label">Divisão do casal</div>
-    <div class="stat-note">Yago: ${(st.divisao.gastoYagoPct * 100).toFixed(0)}% do gasto · ${(st.divisao.rendaYagoPct * 100).toFixed(0)}% da renda</div>
-    <div class="stat-note">Gabriela: ${(st.divisao.gastoGabrielaPct * 100).toFixed(0)}% do gasto · ${(st.divisao.rendaGabrielaPct * 100).toFixed(0)}% da renda</div>`;
+    <div class="stat-note"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--yago);margin-right:5px;"></span>Yago: ${(st.divisao.gastoYagoPct * 100).toFixed(0)}% do gasto · ${(st.divisao.rendaYagoPct * 100).toFixed(0)}% da renda</div>
+    <div class="stat-note"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gabriela);margin-right:5px;"></span>Gabriela: ${(st.divisao.gastoGabrielaPct * 100).toFixed(0)}% do gasto · ${(st.divisao.rendaGabrielaPct * 100).toFixed(0)}% da renda</div>`;
   box.appendChild(c6);
 }
 
@@ -457,10 +462,10 @@ function renderTable(list) {
     tr.innerHTML = `<td>${dataFmt}</td><td>${e.categoria}</td><td>${e.quem || "—"}</td><td><span class="tag">${tipoLabel}</span></td><td>${e.formaPagamento || "—"}</td><td>${e.descricao || "—"}</td><td class="val ${e.tipo}">${e.tipo === "receita" ? "+" : "-"} ${currency(e.valor)}</td><td class="row-actions"></td>`;
     const actions = tr.querySelector(".row-actions");
     const editBtn = document.createElement("button");
-    editBtn.className = "ghost"; editBtn.textContent = "✎"; editBtn.title = "Editar";
+    editBtn.className = "ghost"; editBtn.innerHTML = ICON_EDIT; editBtn.title = "Editar";
     editBtn.addEventListener("click", () => startEditEntry(e.id));
     const delBtn = document.createElement("button");
-    delBtn.className = "ghost danger"; delBtn.textContent = "🗑"; delBtn.title = "Excluir";
+    delBtn.className = "ghost danger"; delBtn.innerHTML = ICON_TRASH; delBtn.title = "Excluir";
     delBtn.addEventListener("click", () => confirmDeleteEntry(e.id));
     actions.appendChild(editBtn); actions.appendChild(delBtn);
     body.appendChild(tr);
@@ -549,10 +554,10 @@ function renderParcelamentos() {
       <td class="row-actions"></td>`;
     const actions = tr.querySelector(".row-actions");
     const editBtn = document.createElement("button");
-    editBtn.className = "ghost"; editBtn.textContent = "✎"; editBtn.title = "Editar";
+    editBtn.className = "ghost"; editBtn.innerHTML = ICON_EDIT; editBtn.title = "Editar";
     editBtn.addEventListener("click", () => startEditParcela(p.id));
     const delBtn = document.createElement("button");
-    delBtn.className = "ghost danger"; delBtn.textContent = "🗑"; delBtn.title = "Excluir";
+    delBtn.className = "ghost danger"; delBtn.innerHTML = ICON_TRASH; delBtn.title = "Excluir";
     delBtn.addEventListener("click", () => confirmDeleteParcela(p.id));
     actions.appendChild(editBtn); actions.appendChild(delBtn);
     body.appendChild(tr);
@@ -572,7 +577,7 @@ function renderCategoryManager() {
       const chip = document.createElement("span"); chip.className = "cat-chip";
       const span = document.createElement("span"); span.textContent = cat;
       const del = document.createElement("button");
-      del.type = "button"; del.textContent = "✕"; del.title = "Remover categoria";
+      del.type = "button"; del.innerHTML = ICON_CLOSE; del.title = "Remover categoria";
       del.addEventListener("click", () => {
         const inUse = state.entries.some((e) => e.tipo === tipo && e.categoria === cat) || (tipo === "gasto" && state.parcelamentos.some((p) => p.categoria === cat));
         if (inUse && !confirm(`A categoria "${cat}" já tem lançamentos. Remover mesmo assim? (os lançamentos existentes mantêm o nome da categoria)`)) return;
@@ -590,7 +595,7 @@ function renderPaymentManager() {
     const chip = document.createElement("span"); chip.className = "cat-chip";
     const span = document.createElement("span"); span.textContent = fp;
     const del = document.createElement("button");
-    del.type = "button"; del.textContent = "✕"; del.title = "Remover";
+    del.type = "button"; del.innerHTML = ICON_CLOSE; del.title = "Remover";
     del.addEventListener("click", () => {
       const inUse = state.entries.some((e) => e.formaPagamento === fp) || state.parcelamentos.some((p) => p.formaPagamento === fp);
       if (inUse && !confirm(`"${fp}" já está em uso. Remover mesmo assim?`)) return;
